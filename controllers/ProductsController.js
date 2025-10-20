@@ -1,41 +1,43 @@
 const products = require("../models/products")
+const { StatusCodes } = require('http-status-codes');
 
-exports.get = async (req, res) => {
+exports.getAll = async (req, res) => {
     try {
-        const productsAll = await products.find()
-        res.json(productsAll)
+        const productsAll = await Product.find();
+        res.json(productsAll);
     } catch(err) {
-        res.status(500).json({'message': err.mesage})
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
     }
 }
 
-exports.getById = async(req,res) => {
+exports.getById = async (req, res, next) => {
+    let product;
     try {
-        const product = await products.findById(res.params.id)
-        if (good == null) {
-            return res.status(404).json({message: "Cannot find good with id " + req.params.id})   
+        product = await Product.findById(req.params.id);
+        if (!product) {
+            return res.status(StatusCodes.NOT_FOUND).json({ message: "Cannot find product with id " + req.params.id });
         }
     } catch (err) {
-        res.status(500).json({'message': err.mesage})
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
     }
-    res.product = product
-    next()
+    res.product = product;
+    next();
 }
 
-exports.post = async (req, res) => {
-    const newProduct = new products({
-        id: req.body._id,
+exports.create = async (req, res) => {
+    const newProduct = new Product({
         name: req.body.name,
         description: req.body.description,
         price: req.body.price,
         weight: req.body.weight,
         category: req.body.category
-    })
+    });
+
     try {
-        const addedProduct = await newProduct.save()
-        res.status(201).json(addedProduct)
+        const addedProduct = await newProduct.save();
+        res.status(StatusCodes.CREATED).json(addedProduct);
     } catch (err) {
-        res.status(400).json({'message': err.message})
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
     }
 }
 
@@ -50,8 +52,8 @@ exports.put = async (req, res) => {
 
     try {
         const updatedProduct = await product.save();
-        res.status(200).json(updatedProduct);
+        res.status(StatusCodes.OK).json(updatedProduct);
     } catch (err) {
-        res.status(400).json({ 'message': err.message });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 'message': err.message });
     }
 }

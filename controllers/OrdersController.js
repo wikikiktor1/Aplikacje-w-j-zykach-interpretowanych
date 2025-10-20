@@ -1,15 +1,16 @@
 const Order = require("../models/Order");
 const OrderStatus = require("../models/OrderStatus");
 const Product = require("../models/Product");
+const { StatusCodes } = require('http-status-codes');
 
 exports.getAll = async (req, res) => {
     try {
         const orders = await Order.find()
             .populate('status')
             .populate('items.product');
-        res.json(orders);
+            res.status(StatusCodes.OK).json(orders);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
     }
 }
 
@@ -19,9 +20,9 @@ exports.getById = async (req, res, next) => {
         order = await Order.findById(req.params.id)
             .populate('status')
             .populate('items.product');
-        if (!order) return res.status(404).json({ message: "Cannot find order with id " + req.params.id });
+        if (!order) return res.status(StatusCodes.NOT_FOUND).json({ message: "Cannot find order with id " + req.params.id });
     } catch (err) {
-        return res.status(500).json({ message: err.message });
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
     }
     res.order = order;
     next();
@@ -31,9 +32,9 @@ exports.create = async (req, res) => {
     try {
         for (const item of req.body.items) {
             const productExists = await Product.findById(item.product);
-            if (!productExists) return res.status(400).json({ message: `Product ${item.product} not found` });
+            if (!productExists) return res.status(StatusCodes.NOT_FOUND).json({ message: `Product ${item.product} not found` });
             if (!Number.isInteger(item.quantity) || item.quantity <= 0)
-                return res.status(400).json({ message: `Invalid quantity for product ${item.product}` });
+                return res.status(StatusCodes.BAD_REQUEST).json({ message: `Invalid quantity for product ${item.product}` });
         }
 
         const pendingStatus = await OrderStatus.findOne({ name: 'PENDING' });
@@ -48,9 +49,9 @@ exports.create = async (req, res) => {
         });
 
         const addedOrder = await newOrder.save();
-        res.status(201).json(addedOrder);
+        res.status(StatusCodes.CREATED).json(addedOrder);
     } catch (err) {
-        res.status(400).json({ message: err.message });
+       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
     }
 }
 
@@ -59,20 +60,20 @@ exports.updateStatus = async (req, res) => {
 
     try {
         const newStatus = await OrderStatus.findById(req.body.status);
-        if (!newStatus) return res.status(400).json({ message: 'Invalid status' });
+        if (!newStatus) return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Invalid status' });
 
         const currentStatus = await OrderStatus.findById(order.status);
         if (currentStatus.name === 'CANCELLED' && newStatus.name === 'COMPLETED') {
-            return res.status(400).json({ message: 'Cannot complete a cancelled order' });
+            return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Cannot complete a cancelled order' });
         }
 
         order.status = newStatus._id;
         if (newStatus.name === 'APPROVED') order.approvedAt = new Date();
 
         const updatedOrder = await order.save();
-        res.status(200).json(updatedOrder);
+        res.status(StatusCodes.OK).json(updatedOrder);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
     }
 }
 
@@ -86,7 +87,7 @@ exports.getByStatus = async (req, res) => {
             .populate('items.product');
         res.json(orders);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
     }
 }
 
@@ -95,6 +96,6 @@ exports.getAllStatuses = async (req, res) => {
         const statuses = await OrderStatus.find();
         res.json(statuses);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
     }
 }
