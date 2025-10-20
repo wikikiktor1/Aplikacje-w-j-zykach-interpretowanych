@@ -30,6 +30,32 @@ exports.getById = async (req, res, next) => {
 
 exports.create = async (req, res) => {
     try {
+        const { userName, email, phone, items } = req.body;
+        if (!userName || !email || !phone) {
+            return res.status(StatusCodes.BAD_REQUEST)
+                .json({ message: "Pola użytkownika (userName, email, phone) nie mogą być puste" });
+        }
+
+        if (!/^\d+$/.test(phone)) {
+            return res.status(StatusCodes.BAD_REQUEST)
+                .json({ message: "Numer telefonu zawiera niedozwolone znaki" });
+        }
+
+        if (!Array.isArray(items) || items.length === 0) {
+            return res.status(StatusCodes.BAD_REQUEST)
+                .json({ message: "Lista produktów nie może być pusta" });
+        }
+        for (const item of items) {
+            const productExists = await Product.findById(item.product);
+            if (!productExists) 
+                return res.status(StatusCodes.NOT_FOUND)
+                    .json({ message: `Produkt o ID ${item.product} nie istnieje` });
+            if (!Number.isInteger(item.quantity) || item.quantity <= 0) 
+                return res.status(StatusCodes.BAD_REQUEST)
+                    .json({ message: `Nieprawidłowa ilość produktu ${item.product}: ${item.quantity}` });
+        }
+
+
         for (const item of req.body.items) {
             const productExists = await Product.findById(item.product);
             if (!productExists) return res.status(StatusCodes.NOT_FOUND).json({ message: `Product ${item.product} not found` });
@@ -65,6 +91,16 @@ exports.updateStatus = async (req, res) => {
         const currentStatus = await OrderStatus.findById(order.status);
         if (currentStatus.name === 'CANCELLED' && newStatus.name === 'COMPLETED') {
             return res.status(StatusCodes.BAD_REQUEST).json({ message: 'Cannot complete a cancelled order' });
+        }
+
+        const forbiddenTransitions = {
+            'CANCELLED': ['COMPLETED', 'APPROVED', 'PENDING'],
+            'COMPLETED': ['PENDING', 'APPROVED']
+        };
+
+        if (forbiddenTransitions[currentStatus.name]?.includes(newStatus.name)) {
+            return res.status(StatusCodes.BAD_REQUEST)
+                .json({ message: `Nie można zmienić statusu z ${currentStatus.name} na ${newStatus.name}` });
         }
 
         order.status = newStatus._id;
