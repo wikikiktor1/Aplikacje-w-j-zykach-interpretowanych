@@ -9,7 +9,7 @@ const StatusController = require('../controllers/StatusController');
 router.get('/products', ProductsController.getAll);
 router.get('/products/:id', ProductsController.getById);
 router.post('/products', ProductsController.create);
-router.put('/products/:id', ProductsController.updateById);
+router.put('/products/:id', ProductsController.put);
 
 router.get('/categories', CategoriesController.getAll);
 
@@ -18,7 +18,7 @@ router.post('/orders', OrdersController.create);
 router.patch('/orders/:id', OrdersController.updateStatus);
 router.get('/orders/status/:id', OrdersController.getByStatus);
 
-router.get('/status', StatusController.getAll);
+router.get('/status', StatusController.getAllStatuses);
 
 
 module.exports = router;

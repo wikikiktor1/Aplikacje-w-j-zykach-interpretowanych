@@ -1,11 +1,6 @@
 const mongoose = require('mongoose')
 
 const goodSchema = new mongoose.Schema({
-    _id: {
-        type: Number,
-        required: true,
-        unique: true
-    },
 
     name: {
         type: String,
@@ -23,7 +18,7 @@ const goodSchema = new mongoose.Schema({
     },
 
     weight: {
-        type: Double,
+        type: Number,
         required: true
     },
 

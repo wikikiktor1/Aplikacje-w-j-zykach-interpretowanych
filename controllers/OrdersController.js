@@ -1,11 +1,11 @@
-const Order = require("../models/Order");
+const Order = require("../models/orders");
 const OrderStatus = require("../models/OrderStatus");
-const Product = require("../models/Product");
+const Product = require("../models/products");
 const { StatusCodes } = require('http-status-codes');
 
 exports.getAll = async (req, res) => {
     try {
-        const orders = await Order.find()
+        const orders = await Order.find({})
             .populate('status')
             .populate('items.product');
             res.status(StatusCodes.OK).json(orders);
