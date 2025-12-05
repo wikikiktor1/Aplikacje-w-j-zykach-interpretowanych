@@ -1,6 +1,6 @@
 const Product = require("../models/products")
 const { StatusCodes } = require('http-status-codes');
-
+const axios = require('axios')
 
 exports.getAll = async (req, res) => {
     try {
@@ -65,5 +65,51 @@ exports.put = async (req, res) => {
         res.status(StatusCodes.OK).json(updatedProduct);
     } catch (err) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ 'message': err.message });
+    }
+}
+
+exports.getSeoDescription = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if (!product) {
+            return res.status(StatusCodes.NOT_FOUND).json({message: `Produkt o ID ${req.params.id} nie został znaleziony`});
+        }
+        const prompt = `
+            Jesteś ekspertem SEO i copywriterem e-commerce. 
+            Stwórz atrakcyjny opis produktu w formacie HTML (użyj tagów takich jak <h2>, <p>, <ul>, <li>, <strong>) dla produktu o nazwie "${product.name}".
+            
+            Dane produktu:
+            - Kategoria: ${product.category ? product.category.name : 'Ogólna'}
+            - Cena: ${product.price} PLN
+            - Waga: ${product.weight}
+            - Krótki opis techniczny: ${product.description}
+            
+            Wymagania:
+            - Opis ma być zachęcający do zakupu.
+            - Tekst musi być sformatowany w czystym HTML (bez znaczników html na początku).
+            - Podkreśl zalety produktu.
+            `;
+
+        const aiResp = await axios.post("https://api.groq.com/openai/v1/chat/completions",{
+            model: "openai/gpt-oss-20b",
+            messages: [
+                {
+                role: "user",
+                content: prompt
+            }
+            ]}, {
+            headers: {
+                'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await aiResp.data.choices[0].message.content;
+        res.status(StatusCodes.OK).json({
+            productId: product._id,
+            seoDescription: data
+        });
+
+        } catch (err) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({})
     }
 }

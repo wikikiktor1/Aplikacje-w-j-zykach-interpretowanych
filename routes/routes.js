@@ -10,6 +10,7 @@ router.get('/products', ProductsController.getAll);
 router.get('/products/:id', ProductsController.getById);
 router.post('/products', ProductsController.create);
 router.put('/products/:id', ProductsController.put);
+router.get('/:id/seo-description', ProductsController.getSeoDescription)
 
 router.get('/categories', CategoriesController.getAll);
 
