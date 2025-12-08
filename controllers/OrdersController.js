@@ -135,3 +135,45 @@ exports.getAllStatuses = async (req, res) => {
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
     }
 }
+
+exports.addOpinion = async (req, res) => {
+    try {
+        const orderId = req.params.id;
+        const { rating, content } = req.body;
+        const userId = req.user?.id;
+
+        if (!rating || !content) {
+            return res.status(400).json({ message: 'Wymagane: rating, content' });
+        }
+        if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+            return res.status(400).json({ message: 'Ocena musi być liczbą całkowitą z zakresu 1-5' });
+        }
+
+        const order = await Order.findById(orderId).populate('status');
+        if (!order) {
+            return res.status(400).json({ message: 'Zamówienie nie istnieje' });
+        }
+
+        // Sprawdź czy użytkownik jest właścicielem zamówienia
+        if (order.userName !== req.user?.login && order.email !== req.user?.email) {
+            // Alternatywnie, jeśli zamówienie przechowuje userId, porównaj z req.user.id
+            return res.status(403).json({ message: 'Brak uprawnień do dodania opinii do tego zamówienia' });
+        }
+
+        // Sprawdź status zamówienia
+        const statusName = order.status?.name;
+        if (statusName !== 'COMPLETED' && statusName !== 'CANCELLED' && statusName !== 'ZREALIZOWANE' && statusName !== 'ANULOWANE') {
+            return res.status(400).json({ message: 'Opinię można dodać tylko do zamówienia zrealizowanego lub anulowanego' });
+        }
+
+        order.opinions.push({
+            rating,
+            content,
+            user: userId
+        });
+        await order.save();
+        return res.status(201).json({ message: 'Opinia dodana' });
+    } catch (err) {
+        return res.status(400).json({ message: err.message });
+    }
+}

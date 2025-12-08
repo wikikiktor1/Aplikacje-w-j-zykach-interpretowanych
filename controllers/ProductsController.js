@@ -1,6 +1,7 @@
 const Product = require("../models/products")
 const { StatusCodes } = require('http-status-codes');
 const axios = require('axios')
+const csv = require('csv-parse/lib/sync');
 
 exports.getAll = async (req, res) => {
     try {
@@ -111,5 +112,31 @@ exports.getSeoDescription = async (req, res) => {
 
         } catch (err) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({})
+    }
+}
+
+exports.initProducts = async (req, res) => {
+    try {
+        const existingCount = await Product.countDocuments();
+        if (existingCount > 0) {
+            return res.status(409).json({ message: 'Baza produktów została już zainicjalizowana.' });
+        }
+
+        let productsData = [];
+        if (req.is('application/json')) {
+            productsData = Array.isArray(req.body) ? req.body : [req.body];
+        } else if (req.is('text/csv')) {
+            productsData = csv(req.body, {
+                columns: true,
+                skip_empty_lines: true
+            });
+        } else {
+            return res.status(400).json({ message: 'Obsługiwane formaty: application/json, text/csv' });
+        }
+
+        await Product.insertMany(productsData);
+        return res.status(200).json({ message: 'Inicjalizacja produktów zakończona sukcesem.' });
+    } catch (err) {
+        return res.status(500).json({ message: err.message });
     }
 }
