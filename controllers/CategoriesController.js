@@ -9,3 +9,15 @@ exports.getAll = async (req, res) => {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
     }
 }
+
+exports.create = async (req, res) => {
+    try {
+        const newCategory = new categories({
+            name: req.body.name
+        });
+        const createdCategory = await newCategory.save();
+        res.status(StatusCodes.CREATED).json(createdCategory);
+    } catch (err) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
+    }
+}

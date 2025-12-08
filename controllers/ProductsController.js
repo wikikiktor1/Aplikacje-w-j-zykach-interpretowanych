@@ -12,7 +12,7 @@ exports.getAll = async (req, res) => {
     }
 }
 
-exports.getById = async (req, res, next) => {
+exports.getById = async (req, res) => {
     let product;
     try {
         product = await Product.findById(req.params.id);
@@ -22,8 +22,7 @@ exports.getById = async (req, res, next) => {
     } catch (err) {
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
     }
-    res.product = product;
-    next();
+    res.status(StatusCodes.OK).json(product);
 }
 
 exports.create = async (req, res) => {
@@ -92,7 +91,7 @@ exports.getSeoDescription = async (req, res) => {
             `;
 
         const aiResp = await axios.post("https://api.groq.com/openai/v1/chat/completions",{
-            model: "openai/gpt-oss-20b",
+            model: "openai/gpt-oss-120b",
             messages: [
                 {
                 role: "user",
@@ -100,8 +99,8 @@ exports.getSeoDescription = async (req, res) => {
             }
             ]}, {
             headers: {
-                'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
-                'Content-Type': 'application/json'
+                "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+                "Content-Type": "application/json"
             }
         });
         const data = await aiResp.data.choices[0].message.content;
@@ -111,7 +110,13 @@ exports.getSeoDescription = async (req, res) => {
         });
 
         } catch (err) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({})
+        console.log("Mój klucz to:", process.env.GROQ_API_KEY);
+        console.error("Błąd:", err.response ? err.response.data : err.message);
+
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "Wystąpił błąd podczas generowania opisu",
+            error: err.response ? err.response.data : err.message
+        });
     }
 }
 

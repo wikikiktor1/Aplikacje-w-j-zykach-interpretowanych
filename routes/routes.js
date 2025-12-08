@@ -12,6 +12,7 @@ const auth = require('../middleware/auth');
 router.post('/login', AuthController.login);
 router.post('/token', AuthController.refreshToken);
 router.post('/logout', auth.authorize(), AuthController.logout);
+router.post('/register', AuthController.register);
 
 router.get('/products', ProductsController.getAll);
 router.get('/products/:id', ProductsController.getById);
@@ -19,8 +20,8 @@ router.post('/products', auth.authorize('PRACOWNIK'), ProductsController.create)
 router.put('/products/:id', auth.authorize('PRACOWNIK'), ProductsController.put);
 router.get('/:id/seo-description', ProductsController.getSeoDescription)
 
-
 router.get('/categories', CategoriesController.getAll);
+router.post('/categories', auth.authorize('PRACOWNIK'), CategoriesController.create);
 
 router.get('/orders', auth.authorize('PRACOWNIK'), OrdersController.getAll);
 router.post('/orders', auth.authorize('KLIENT','PRACOWNIK'), OrdersController.create);

@@ -77,50 +77,28 @@ exports.logout = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
-    exports.register = async (req, res) => {
-        try {
-            const { login, password, role } = req.body;
-            if (!login || !password || !role) {
-                return res.status(400).json({ message: 'Wymagane: login, password, role' });
-            }
+}
 
-            const salt = await bcrypt.genSalt(10);
-            const passwordHash = await bcrypt.hash(password, salt);
-
-            const newUser = new User({
-                username: login,
-                passwordHash: passwordHash,
-                role: role
-            });
-
-            await newUser.save();
-            res.status(201).json({ message: 'Użytkownik zarejestrowany' });
-        } catch (err) {
-            res.status(500).json({ message: err.message });
+exports.register = async (req, res) => {
+    try {
+        const { login, password, role } = req.body;
+        if (!login || !password || !role) {
+            return res.status(400).json({ message: 'Wymagane: login, password, role' });
         }
-    }
 
-    exports.register = async (req, res) => {
-        try {
-            const { login, password, role } = req.body;
-            if (!login || !password || !role) {
-                return res.status(400).json({ message: 'Wymagane: login, password, role' });
-            }
+        const salt = await bcrypt.genSalt(10);
+        const passwordHash = await bcrypt.hash(password, salt);
 
-            const salt = await bcrypt.genSalt(10);
-            const passwordHash = await bcrypt.hash(password, salt);
+        const newUser = new User({
+            username: login,
+            passwordHash: passwordHash,
+            role: role
+        });
 
-            const newUser = new User({
-                username: login,
-                passwordHash: passwordHash,
-                role: role
-            });
-
-            await newUser.save();
-            res.status(201).json({ message: 'Użytkownik zarejestrowany' });
-        } catch (err) {
-            res.status(500).json({ message: err.message });
-        }
+        await newUser.save();
+        res.status(201).json({ message: 'Użytkownik zarejestrowany' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 }
 
