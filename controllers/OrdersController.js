@@ -5,7 +5,7 @@ const { StatusCodes } = require('http-status-codes');
 
 exports.getAll = async (req, res) => {
     try {
-        const orders = await Order.find({})
+        const orders = await Order.find(req.query.userName)
             .populate('status')
             .populate('items.product');
             res.status(StatusCodes.OK).json(orders);
