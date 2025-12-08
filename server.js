@@ -7,7 +7,7 @@ app.use(express.text({ type: 'text/csv' }));
 
 const mongoose = require('mongoose');
 const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/zad3';
-mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(mongoUri)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.warn('MongoDB connection error', err));
 

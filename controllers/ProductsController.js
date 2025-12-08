@@ -1,7 +1,7 @@
 const Product = require("../models/products")
 const { StatusCodes } = require('http-status-codes');
 const axios = require('axios')
-const csv = require('csv-parse/lib/sync');
+const { parse } = require('csv-parse/sync');
 
 exports.getAll = async (req, res) => {
     try {
@@ -126,7 +126,7 @@ exports.initProducts = async (req, res) => {
         if (req.is('application/json')) {
             productsData = Array.isArray(req.body) ? req.body : [req.body];
         } else if (req.is('text/csv')) {
-            productsData = csv(req.body, {
+            productsData = parse(req.body, {
                 columns: true,
                 skip_empty_lines: true
             });
