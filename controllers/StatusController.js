@@ -1,11 +1,17 @@
 const OrderStatus = require('../models/OrderStatus');
 const { StatusCodes } = require('http-status-codes');
+const { sendProblemDetails } = require('../utils/problemDetails');
 
 exports.getAllStatuses = async (req, res) => {
     try {
         const statuses = await OrderStatus.find({});
         res.status(StatusCodes.OK).json(statuses);
     } catch (err) {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ message: err.message });
+        sendProblemDetails(res, {
+            type: '/problems/internal-server-error',
+            status: StatusCodes.INTERNAL_SERVER_ERROR,
+            detail: err.message,
+            instance: req.originalUrl
+        });
     }
 };
