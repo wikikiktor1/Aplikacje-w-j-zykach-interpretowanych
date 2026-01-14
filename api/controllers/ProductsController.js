@@ -7,7 +7,15 @@ const { sendProblemDetails } = require('../utils/problemDetails');
 
 exports.getAll = async (req, res) => {
     try {
-        const productsAll = await Product.find({});
+        const { search, categoryId } = req.query;
+        let query = {};
+        if (search) {
+            query.name = { $regex: search, $options: 'i' };
+        }
+        if (categoryId) {
+            query.category = categoryId;
+        }
+        const productsAll = await Product.find(query).populate('category');
         res.json(productsAll);
     } catch (err) {
         sendProblemDetails(res, {
@@ -45,7 +53,6 @@ exports.getById = async (req, res) => {
 };
 
 exports.create = async (req, res) => {
-    // walidacja wejścia - użyj Problem Details dla błędów 400
     if (req.body.price == null || req.body.price <= 0) {
         return sendProblemDetails(res, {
             type: '/problems/validation-error',
@@ -236,6 +243,26 @@ exports.initProducts = async (req, res) => {
             title: 'Błąd serwera',
             status: StatusCodes.INTERNAL_SERVER_ERROR,
             detail: err.message,
+            instance: req.originalUrl
+        });
+    }
+};
+
+exports.delete = async (req, res) => {
+    try {
+        const deletedProduct = await Product.findByIdAndDelete(req.params.id);
+
+        if (!deletedProduct) {
+            return res.status(404).json({ detail: "Produkt nie został znaleziony" });
+        }
+
+        res.status(204).send();
+    } catch (error) {
+        return sendProblemDetails(res, {
+            type: '/problems/internal-server-error',
+            title: 'Błąd serwera',
+            status: StatusCodes.INTERNAL_SERVER_ERROR,
+            detail: error.message,
             instance: req.originalUrl
         });
     }

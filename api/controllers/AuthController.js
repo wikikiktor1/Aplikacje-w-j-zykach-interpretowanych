@@ -1,4 +1,3 @@
-
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
@@ -9,7 +8,7 @@ const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET || 'change_this_secr
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || 'change_this_refresh_secret';
 
 function generateAccessToken(user) {
-    return jwt.sign({ userId: user._id, role: user.role }, ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+    return jwt.sign({ userId: user._id, role: user.role, email:user.email}, ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
 }
 function generateRefreshToken(user) {
     return jwt.sign({ userId: user._id }, REFRESH_TOKEN_SECRET, { expiresIn: '7d' });
@@ -57,7 +56,10 @@ exports.login = async (req, res) => {
         user.refreshToken = refreshToken;
         await user.save();
 
-        res.json({ accessToken, refreshToken });
+        // Sprawdzamy czy profil jest kompletny
+        const isProfileComplete = !!(user.fullName && user.email && user.phone);
+
+        res.json({ accessToken, refreshToken, isProfileComplete });
     } catch (err) {
         sendProblemDetails(res, {
             type: '/problems/internal-server-error',
@@ -156,13 +158,13 @@ exports.logout = async (req, res) => {
 
 exports.register = async (req, res) => {
     try {
-        const { login, password, role } = req.body;
-        if (!login || !password || !role) {
+        const { login, password} = req.body;
+        if (!login || !password) {
             return sendProblemDetails(res, {
                 type: '/problems/validation-error',
                 title: 'Błąd walidacji danych',
                 status: StatusCodes.BAD_REQUEST,
-                detail: 'Wymagane: login, password, role',
+                detail: 'Wymagane: login, password',
                 extras: { invalid_params: [{ name: 'login' }, { name: 'password' }, { name: 'role' }] },
                 instance: req.originalUrl
             });
@@ -174,7 +176,7 @@ exports.register = async (req, res) => {
         const newUser = new User({
             username: login,
             passwordHash: passwordHash,
-            role: role
+            role: 'KLIENT'
         });
 
         await newUser.save();
@@ -186,6 +188,50 @@ exports.register = async (req, res) => {
             status: StatusCodes.INTERNAL_SERVER_ERROR,
             detail: err.message,
             instance: req.originalUrl
+        });
+    }
+}
+
+exports.getMe = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select('-passwordHash -refreshToken');
+        if (!user) return res.sendStatus(StatusCodes.NOT_FOUND);
+        res.json(user);
+    } catch (err) {
+        sendProblemDetails(res, {
+            type: '/problems/internal-server-error',
+            status: StatusCodes.INTERNAL_SERVER_ERROR,
+            detail: err.message
+        });
+    }
+}
+
+exports.updateProfile = async (req, res) => {
+    try {
+        const { fullName, email, phone } = req.body;
+
+        if (!fullName || !email || !phone) {
+            return sendProblemDetails(res, {
+                type: '/problems/validation-error',
+                status: StatusCodes.BAD_REQUEST,
+                detail: 'Wszystkie pola (Imię, Email, Telefon) są wymagane.'
+            });
+        }
+
+        const user = await User.findById(req.user.id);
+        if (!user) return res.sendStatus(StatusCodes.NOT_FOUND);
+
+        user.fullName = fullName;
+        user.email = email;
+        user.phone = phone;
+
+        await user.save();
+        res.json({ message: 'Profil zaktualizowany', user });
+    } catch (err) {
+        sendProblemDetails(res, {
+            type: '/problems/internal-server-error',
+            status: StatusCodes.INTERNAL_SERVER_ERROR,
+            detail: err.message
         });
     }
 }

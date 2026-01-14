@@ -7,7 +7,12 @@ const { sendProblemDetails } = require('../utils/problemDetails');
 
 exports.getAll = async (req, res) => {
     try {
-        const orders = await Order.find(req.query.userName)
+        let filter = {};
+
+        if (req.user.role === 'KLIENT') {
+            filter.email = req.user.email;
+        }
+        const orders = await Order.find(filter)
             .populate('status')
             .populate('items.product');
         res.status(StatusCodes.OK).json(orders);
@@ -176,6 +181,7 @@ exports.updateStatus = async (req, res) => {
         }
 
         order.status = newStatus._id;
+        order.approvedAt = new Date();
         if (newStatus.name === 'APPROVED') order.approvedAt = new Date();
 
         const updatedOrder = await order.save();
@@ -245,7 +251,7 @@ exports.addOpinion = async (req, res) => {
                 type: '/problems/validation-error',
                 title: 'Błąd walidacji danych',
                 status: StatusCodes.BAD_REQUEST,
-                detail: 'Wymagane: rating, content',
+                detail: 'Wymagane pola: ocena i treść opinii',
                 extras: { invalid_params: [{ name: 'rating' }, { name: 'content' }] },
                 instance: req.originalUrl
             });
@@ -266,24 +272,26 @@ exports.addOpinion = async (req, res) => {
             return sendProblemDetails(res, {
                 type: '/problems/order-not-found',
                 title: 'Zamówienie nie istnieje',
-                status: StatusCodes.BAD_REQUEST,
+                status: StatusCodes.NOT_FOUND, // Poprawiono status code
                 detail: 'Zamówienie nie istnieje',
                 instance: req.originalUrl
             });
         }
 
-        if (order.userName !== req.user?.login && order.email !== req.user?.email) {
+        if (order.email !== req.user?.email && order.userName !== req.user?.userName) {
             return sendProblemDetails(res, {
                 type: '/problems/forbidden',
                 title: 'Brak uprawnień',
                 status: StatusCodes.FORBIDDEN,
-                detail: 'Brak uprawnień do dodania opinii do tego zamówienia',
+                detail: `Brak uprawnień do dodania opinii do tego zamówienia.`,
                 instance: req.originalUrl
             });
         }
 
-        const statusName = order.status?.name;
-        if (statusName !== 'COMPLETED' && statusName !== 'CANCELLED' && statusName !== 'ZREALIZOWANE' && statusName !== 'ANULOWANE') {
+        const statusName = order.status?.name?.toUpperCase();
+        const allowedStatuses = ['COMPLETED', 'CANCELLED', 'ZREALIZOWANE', 'ANULOWANE'];
+
+        if (!allowedStatuses.includes(statusName)) {
             return sendProblemDetails(res, {
                 type: '/problems/invalid-state',
                 title: 'Nieprawidłowy stan zamówienia',
@@ -293,13 +301,26 @@ exports.addOpinion = async (req, res) => {
             });
         }
 
+        if (order.opinions && order.opinions.length > 0) {
+            return sendProblemDetails(res, {
+                type: '/problems/conflict',
+                title: 'Opinia już istnieje',
+                status: StatusCodes.CONFLICT,
+                detail: 'Opinia do tego zamówienia została już dodana.',
+                instance: req.originalUrl
+            });
+        }
+
         order.opinions.push({
             rating,
             content,
-            user: userId
+            user: userId,
+            createdAt: new Date()
         });
+
         await order.save();
-        return res.status(StatusCodes.CREATED).json({ message: 'Opinia dodana' });
+        return res.status(StatusCodes.CREATED).json({ message: 'Opinia dodana pomyślnie' });
+
     } catch (err) {
         return sendProblemDetails(res, {
             type: '/problems/internal-server-error',

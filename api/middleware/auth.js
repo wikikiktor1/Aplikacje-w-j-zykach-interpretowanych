@@ -20,7 +20,7 @@ exports.authenticate = async (req, res, next) => {
   if (!token) return res.status(401).json({ message: 'Token missing' });
   try {
     const payload = jwt.verify(token, ACCESS_TOKEN_SECRET);
-    req.user = { id: payload.userId, role: payload.role };
+    req.user = { id: payload.userId, role: payload.role, email: payload.email };
     next();
   } catch (err) {
     return res.status(401).json({ message: 'Invalid or expired token' });
@@ -33,7 +33,7 @@ exports.authorize = (...roles) => {
     if (!token) return res.status(401).json({ message: 'Token missing' });
     try {
       const payload = jwt.verify(token, ACCESS_TOKEN_SECRET);
-      req.user = { id: payload.userId, role: payload.role };
+      req.user = { id: payload.userId, role: payload.role, email: payload.email };
       if (roles && roles.length > 0 && !roles.includes(req.user.role)) {
         return res.status(403).json({ message: 'Brak uprawnień' });
       }
