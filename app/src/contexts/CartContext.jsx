@@ -25,19 +25,25 @@ export function CartProvider({ children }){
       return [...prev, { product, qty }]
     })
   }
+
   function remove(productId){
     setItems(prev=>prev.filter(p=>p.product._id!==productId))
   }
+
   function changeQty(productId, qty){
     setItems(prev=>prev.map(p=>p.product._id===productId?{...p, qty}:p))
   }
-  function clear(){ setItems([]) }
+
+  function clear(){
+    setItems([])
+  }
+
   function total(){
     return items.reduce((s,it)=> s + (it.product.price || 0) * it.qty, 0)
   }
 
   return (
-    <CartContext.Provider value={{ items, add, remove, changeQty, clear, total }}>
+    <CartContext.Provider value={{ items, add, clear, remove, changeQty, total }}>
       {children}
     </CartContext.Provider>
   )

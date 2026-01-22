@@ -16,3 +16,6 @@ export const addOrderReview = async (orderId, reviewData) => {
   const res = await api.post(`/orders/${orderId}/opinions`, reviewData)
   return res.data
 }
+export function fetchPublicReviews() {
+  return api.get('/orders/opinions').then(r => r.data)
+}

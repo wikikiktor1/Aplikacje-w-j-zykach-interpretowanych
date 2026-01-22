@@ -20,11 +20,12 @@ router.delete('/products/:id', auth.authorize('PRACOWNIK'), ProductsController.d
 router.get('/categories', CategoriesController.getAll);
 router.post('/categories', auth.authorize('PRACOWNIK'), CategoriesController.create);
 
-router.get('/orders', auth.authorize('PRACOWNIK','KLIENT'), OrdersController.getAll);
+router.get('/orders',auth.authorize('KLIENT','PRACOWNIK'),  OrdersController.getAll);
 router.post('/orders', auth.authorize('KLIENT','PRACOWNIK'), OrdersController.create);
 router.patch('/orders/:id', auth.authorize('PRACOWNIK'), OrdersController.getById, OrdersController.updateStatus);
 router.get('/orders/status/:id', auth.authorize('PRACOWNIK'), OrdersController.getByStatus);
-router.post('/orders/:id/opinions', auth.authorize('KLIENT','PRACOWNIK'), OrdersController.addOpinion);
+router.post('/orders/:id/opinions',auth.authorize('KLIENT','PRACOWNIK'), OrdersController.addOpinion);
+router.get('/orders/opinions', OrdersController.getPublicReviews);
 
 router.get('/status', StatusController.getAllStatuses);
 

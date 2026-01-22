@@ -331,3 +331,42 @@ exports.addOpinion = async (req, res) => {
         });
     }
 }
+
+exports.getPublicReviews = async (req, res) => {
+    try {
+        const orders = await Order.find({ opinions: { $exists: true, $not: { $size: 0 } } })
+            .select('userName opinions items createdAt')
+            .populate('items.product', 'name');
+
+        const reviews = [];
+
+        orders.forEach(order => {
+            if (order.opinions && Array.isArray(order.opinions)) {
+                order.opinions.forEach(op => {
+                    reviews.push({
+                        orderId: order._id,
+                        author: order.userName || "Anonimowy Klient",
+                        rating: op.rating,
+                        content: op.content,
+                        createdAt: op.createdAt || order.createdAt,
+                        items: order.items.map(i => ({
+                            name: i.product?.name || 'Produkt'
+                        }))
+                    });
+                });
+            }
+        });
+
+        reviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+        res.status(StatusCodes.OK).json(reviews);
+    } catch (err) {
+        sendProblemDetails(res, {
+            type: '/problems/internal-server-error',
+            title: 'Błąd pobierania opinii',
+            status: StatusCodes.INTERNAL_SERVER_ERROR,
+            detail: err.message,
+            instance: req.originalUrl
+        });
+    }
+};
