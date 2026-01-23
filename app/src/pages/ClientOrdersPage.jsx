@@ -51,7 +51,6 @@ export default function ClientOrdersPage() {
                     const isCancelled = ['ANULOWANE', 'CANCELLED'].includes(statusName);
                     const dateDisplay = o.createdAt ? new Date(o.createdAt).toLocaleDateString() : 'Brak daty';
 
-                    // POPRAWKA: Pobieramy opinię z tablicy opinions (pierwszy element)
                     const userReview = (o.opinions && o.opinions.length > 0) ? o.opinions[0] : null;
 
                     return (
@@ -70,7 +69,6 @@ export default function ClientOrdersPage() {
                                     <p>Kwota: <strong>{o.items?.reduce((a, b) => a + (b.price * b.quantity), 0).toFixed(2)} PLN</strong></p>
                                     <hr/>
 
-                                    {/* Logika wyświetlania opinii */}
                                     {userReview ? (
                                         <div className="bg-light p-3 rounded">
                                             <h6 className="text-success"><BiCheckCircle/> Twoja opinia:</h6>

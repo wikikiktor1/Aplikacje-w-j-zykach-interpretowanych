@@ -61,7 +61,6 @@ export default function ProductsPage() {
         ));
     }
 
-    // --- POMOCNIK: Obliczanie średniej (jeśli backend nie zwraca) ---
     const getProductRating = (p) => {
         if (p.averageRating) return p.averageRating;
         if (p.opinions && p.opinions.length > 0) {
@@ -137,7 +136,6 @@ export default function ProductsPage() {
 
     return (
         <div className="container position-relative">
-            {/* --- MODAL Z OPINIAMI --- */}
             {viewReviewsProduct && (
                 <div className="modal fade show d-block" style={{backgroundColor: 'rgba(0,0,0,0.5)'}} tabIndex="-1">
                     <div className="modal-dialog modal-dialog-centered modal-lg">
@@ -213,7 +211,6 @@ export default function ProductsPage() {
                     <div className="card-body p-4">
                         <h5 className="mb-3 text-success">Dodaj nowy produkt</h5>
                         <form onSubmit={handleCreate}>
-                            {/* ... Formularz bez zmian ... */}
                             <div className="row g-2">
                                 <div className="col-md-3"><input className="form-control" placeholder="Nazwa" value={newProd.name} onChange={e=>setNewProd({...newProd, name: e.target.value})} required /></div>
                                 <div className="col-md-2"><input type="number" step="0.01" className="form-control" placeholder="Cena" value={newProd.price} onChange={e=>setNewProd({...newProd, price: e.target.value})} required /></div>
@@ -250,7 +247,6 @@ export default function ProductsPage() {
 
             {isDatabaseEmpty ? (
                 <div className="text-center py-5">
-                    {/* ... (Sekcja INIT bez zmian) ... */}
                     <div className="mb-4"><BiPurchaseTag className="display-1 text-muted opacity-25" /></div>
                     <h3 className="text-muted fw-bold mb-3">Baza danych produktów jest pusta</h3>
                     {isEmployee ? (
@@ -280,7 +276,6 @@ export default function ProductsPage() {
                         const isExpanded = expandedDescriptions[p._id];
                         const isLongDescription = safeDescription.length > 100;
 
-                        // Obliczamy rating do wyświetlenia na karcie
                         const rating = getProductRating(p);
                         const reviewsCount = p.opinions ? p.opinions.length : 0;
 
@@ -289,7 +284,6 @@ export default function ProductsPage() {
                                 <div className="col-12" key={p._id}>
                                     <div className="card shadow border-primary border-2">
                                         <div className="card-body">
-                                            {/* ... Formularz edycji (skrócony dla czytelności) ... */}
                                             <h5 className="card-title text-primary mb-3">Edycja: {p.name}</h5>
                                             <div className="row g-3">
                                                 <div className="col-md-4"><label className="small text-muted">Nazwa</label><input className="form-control" value={editForm.name} onChange={e=>setEditForm({...editForm, name: e.target.value})} /></div>
@@ -311,7 +305,6 @@ export default function ProductsPage() {
                                     <div className="bg-light d-flex align-items-center justify-content-center position-relative" style={{height: '200px'}}>
                                         <BiPurchaseTag className="display-1 text-muted opacity-25" />
 
-                                        {/* BADGE KATEGORII */}
                                         <div className="position-absolute top-0 start-0 m-3">
                                             <span className="badge bg-white text-dark shadow-sm border rounded-pill">
                                                 {p.category?.name || 'Inne'}
@@ -325,7 +318,6 @@ export default function ProductsPage() {
                                             <span className="fw-bold text-success fs-5 text-nowrap">{parseFloat(p.price).toFixed(2)} zł</span>
                                         </div>
 
-                                        {/* --- SEKCJA OCENY I OPINII --- */}
                                         <div className="d-flex align-items-center mb-3 cursor-pointer"
                                              onClick={() => setViewReviewsProduct(p)}
                                              style={{cursor: 'pointer'}}

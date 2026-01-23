@@ -4,20 +4,21 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f57aa454-ca8f-4de6-915c-5318ce5e2fe7" name="Changes" comment="" />
+    <list default="true" id="c6f4a5ff-90d9-4f2a-a8c5-9389408c3b3f" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="50" />
+    <option name="cachedIndexableFilesCount" value="51" />
     <option name="fileBasedEmbeddingIndicesEnabled" value="true" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="JavaScript File" />
         <option value="JSX File" />
       </list>
     </option>
@@ -30,16 +31,16 @@
     <urls />
   </component>
   <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 6
 }</component>
-  <component name="ProjectId" id="37U5aSSWkX1NeOt5Gd9vSUURfSJ" />
+  <component name="ProjectId" id="38c0vuEV6WsJ48IkpCcxlxPeXh7" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -47,7 +48,6 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "git-widget-placeholder": "main",
     "javascript.preferred.runtime.type.id": "node",
-    "last_opened_file_path": "D:/workspace/AplikacjeWJezykachInterpretowalnych/zad4",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -58,8 +58,8 @@
   }
 }]]></component>
   <component name="RecapSpentCounter">
-    <option name="endsOfQuotaMs" value="1768944064710" />
-    <option name="spentUsd" value="0.0619395" />
+    <option name="endsOfQuotaMs" value="1771534813704" />
+    <option name="spentUsd" value="0.00941675" />
   </component>
   <component name="RecapUselessUpdatesCounter">
     <option name="suspendCountdown" value="9" />
@@ -73,16 +73,13 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="f57aa454-ca8f-4de6-915c-5318ce5e2fe7" name="Changes" comment="" />
-      <created>1766944872599</created>
+      <changelist id="c6f4a5ff-90d9-4f2a-a8c5-9389408c3b3f" name="Changes" comment="" />
+      <created>1769083787808</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1766944872599</updated>
-      <workItem from="1766944873772" duration="6775000" />
-      <workItem from="1767361643771" duration="132000" />
-      <workItem from="1767889512966" duration="9508000" />
-      <workItem from="1768134845558" duration="5000" />
-      <workItem from="1768413027361" duration="1583000" />
+      <updated>1769083787808</updated>
+      <workItem from="1769083789982" duration="893000" />
+      <workItem from="1769098226160" duration="3605000" />
     </task>
     <servers />
   </component>

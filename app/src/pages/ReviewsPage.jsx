@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-// ZMIANA: Importujemy fetchPublicReviews zamiast fetchOrders
 import { fetchPublicReviews } from '../api/orders'
 import { Link } from 'react-router-dom'
 import { BiStar, BiMessageDetail, BiLoaderAlt, BiUserCircle, BiPurchaseTag } from 'react-icons/bi'
@@ -15,7 +14,6 @@ export default function ReviewsPage() {
 
     async function loadData() {
         try {
-            // ZMIANA: Używamy dedykowanego endpointu
             const data = await fetchPublicReviews()
             setReviews(data)
         } catch (err) {

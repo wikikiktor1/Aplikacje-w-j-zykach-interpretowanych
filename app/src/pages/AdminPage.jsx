@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { fetchOrders, updateOrderStatus } from '../api/orders'
 import api from '../api/client'
-import { BiStar } from 'react-icons/bi' // Import ikony
+import { BiStar } from 'react-icons/bi'
 
 export default function AdminPage() {
     const [orders, setOrders] = useState([])
@@ -61,7 +61,6 @@ export default function AdminPage() {
                         <th>Data</th>
                         <th>Klient</th>
                         <th>Status</th>
-                        {/* NOWA KOLUMNA */}
                         <th style={{minWidth: '200px'}}>Opinia Klienta</th>
                         <th>Akcja</th>
                     </tr>
