@@ -7,11 +7,11 @@ import AdminPage from './pages/AdminPage'
 import LoginPage from './pages/LoginPage'
 import CompleteProfilePage from './pages/CompleteProfilePage'
 import ClientOrdersPage from "./pages/ClientOrdersPage"
-import ReviewsPage from "./pages/ReviewsPage" // <--- 1. IMPORT
+import ReviewsPage from "./pages/ReviewsPage"
 import ProtectedRoute from './components/ProtectedRoute'
 import { useAuth } from './contexts/AuthContext'
 import { useCart} from './contexts/CartContext'
-import { BiStore, BiCart, BiLogOut, BiUser, BiLogIn, BiChevronDown, BiStar } from 'react-icons/bi' // <--- 2. Ikona gwiazdki
+import { BiStore, BiCart, BiLogOut, BiUser, BiLogIn, BiChevronDown, BiStar } from 'react-icons/bi'
 
 export default function App() {
     const { user, logout } = useAuth()
@@ -55,7 +55,6 @@ export default function App() {
                     <div className={`collapse navbar-collapse justify-content-end ${isNavExpanded ? 'show' : ''}`} id="navbarNav">
                         <div className="d-flex flex-column flex-lg-row align-items-lg-center gap-3 mt-3 mt-lg-0">
 
-                            {/* --- 3. LINK DO OPINII --- */}
                             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                                 <li className="nav-item">
                                     <Link className="nav-link d-flex align-items-center text-white-50 hover-text-white" to="/reviews" onClick={closeNav}>
@@ -110,7 +109,7 @@ export default function App() {
                         <Route path="/" element={<ProductsPage />} />
                         <Route path="/cart" element={<CartPage />} />
                         <Route path="/login" element={<LoginPage />} />
-                        <Route path="/reviews" element={<ReviewsPage />} /> {/* <--- 4. TRASA */}
+                        <Route path="/reviews" element={<ReviewsPage />} />
                         <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
                         <Route path="/complete-profile" element={<ProtectedRoute><CompleteProfilePage /></ProtectedRoute>} />
                         <Route path="/admin" element={<ProtectedRoute roles={['PRACOWNIK']}><AdminPage /></ProtectedRoute>} />
